@@ -1,7 +1,9 @@
-package com.example.hera.presentation
+package com.example.hera.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hera.model.TimerState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +20,7 @@ import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StopWatchViewModel: ViewModel() {
     private val _elapsedTime = MutableStateFlow(0L)
     private val _timeState = MutableStateFlow(TimerState.RESET)
