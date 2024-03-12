@@ -14,20 +14,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class StopWatchViewModel: ViewModel() {
-    private val _elapsedTime = MutableStateFlow(0)
+    private val _elapsedTime = MutableStateFlow(0L)
     private val _timeState = MutableStateFlow(TimerState.RESET)
     val timerState = _timeState.asStateFlow()
 
     private val formatter = DateTimeFormatter.ofPattern("HH:mm:ss:SSS")
     val stopWatchText = _elapsedTime
-        .map { millis-> LocalTime.ofNanoOfDay((millis * 1_000_000).toLong()).format(formatter) }
+        .map { millis ->
+            val duration = Duration.ofMillis(millis)
+            LocalTime.MIDNIGHT.plus(duration).format(formatter)
+        }
         .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = "00:00:00:000"
         )
 
@@ -39,7 +43,7 @@ class StopWatchViewModel: ViewModel() {
                 )
             }
             .onEach { timeDiff ->
-                _elapsedTime.update { (it + timeDiff).toInt() }
+                _elapsedTime.update { (it + timeDiff) }
             }
             .launchIn(viewModelScope)
     }
